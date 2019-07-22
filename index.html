@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="./public/css/style.css">
+    <title>CATS MANIA</title>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Cat Rat Rat</h1>
+        </div>
+    </header>
+
+    <div class="cover">
+        <form id="search-form">
+            <input id="cat-keyword" type="text" placeholder="Search a cat">
+            <button>Find a cat</button>
+        </form>
+    </div>
+    
+
+    
+    
+    <div class="container cat-search">
+        <!-- Do some awesome stuff here -->
+        <h1 class="resultHeader"></h1>
+        <div id="result">
+              
+        </div>
+        
+    </div>
+
+    <img src="./public/img/cat.gif" class="center" id="search-gif">
+
+    
+
+    <script src="./public/js/jquery.min.js"></script>
+    
+    <script>
+       
+
+        
+        // We intialize jQuery here
+        $(function(){
+            // Try to cache your selectors as posible
+            // Here's a sample :
+            var searchForm = $('#search-form');
+            var gifLoading = "./public/img/cat2.gif";
+            var gifNoResult = "./public/img/cat.gif"; 
+            var inputVal = $("#cat-keyword");
+            var searchGif = $('#search-gif');
+            var resultContainer = $('#result');
+            //var resultHeader = $('resultHeader');
+            
+            
+            //These are the variables we need to request from the API
+            var API_URL = 'https://api.thecatapi.com/v1/breeds/search?q=';
+            var API_KEY = 'bd38af4d-fba6-4d1f-bbfd-a98cc4e036d1';
+
+            //Trigger submit form
+            searchForm.on('submit', function(e){
+                
+                
+                //Prevents the form to reload the page
+                e.preventDefault();
+                $(".resultHeader").empty();
+                //$( ".result" ).remove();
+                //$( ".container cat-search" ).remove();
+                //console.log("TEST")
+                searchGif.attr("src", gifLoading);
+                
+
+                $.ajax({
+                method: 'GET',
+                url: API_URL + inputVal.val(), 
+                headers:{
+                'x-api-key' : API_KEY
+                }})
+                
+                .then(function(parameter){
+                
+                $( "h2" ).remove('h2');
+                                
+                if(parameter.length == 1){
+                resultContainer.append(`<h2>Search results for "${inputVal.val()}"</h2>`);
+                searchGif.attr("src" , null);
+                parameter.forEach(function(res){
+                var catName = res.name;
+                var description = res.description;
+                resultContainer.append
+                (`<form id="res">
+                <h5>${catName}</h5>
+                <hr>
+                <hr>
+                <p>${description}</p>
+                <a href="https://en.wikipedia.org/wiki/${catName}_cat">Search on Wikipedia</a>
+                </form>`); 
+                })
+                }
+                else{
+                $('#res').remove();
+                resultContainer.append(`<h2>No search results for "${inputVal.val()}"</h2>`);
+                searchGif.attr("src" , gifNoResult);
+                }                
+                })
+                .catch(function(){
+                //Handle error here IF NEEDED
+                })
+                .then(function(){
+                /*Handle some default behaviours here after the search like the ff:
+                * reset the value of the form to blank
+                * other things that you want to add*/
+                inputVal.val('');
+                })
+               
+            })
+        })
+    </script>
+</body>
+</html>
